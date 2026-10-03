@@ -1,0 +1,134 @@
+<section class="features-section dashboard-workspace-section" id="workspace" aria-labelledby="workspaceHeading">
+    <div class="section-heading">
+        <span>YOUR WORKSPACE</span>
+        <h2 id="workspaceHeading">Nexus Tools</h2>
+    </div>
+
+    <div class="workspace-frame fade-up">
+        <div class="workspace-tabs" role="tablist" aria-label="Nexus tools">
+            <button class="workspace-tab active" id="tab-voice" role="tab" aria-selected="true" aria-controls="panel-voice" data-tab="voice" onclick="switchWorkspaceTab('voice')">🎤 Voice</button>
+            <button class="workspace-tab" id="tab-chat" role="tab" aria-selected="false" aria-controls="panel-chat" data-tab="chat" onclick="switchWorkspaceTab('chat')">🤖 AI Chat</button>
+            <button class="workspace-tab" id="tab-automation" role="tab" aria-selected="false" aria-controls="panel-automation" data-tab="automation" onclick="switchWorkspaceTab('automation')">⚙️ Automation</button>
+            <button class="workspace-tab" id="tab-emotion" role="tab" aria-selected="false" aria-controls="panel-emotion" data-tab="emotion" onclick="switchWorkspaceTab('emotion')">😊 Emotion</button>
+            <button class="workspace-tab" id="tab-memory" role="tab" aria-selected="false" aria-controls="panel-memory" data-tab="memory" onclick="switchWorkspaceTab('memory')">🧠 Memory</button>
+            <button class="workspace-tab" id="tab-productivity" role="tab" aria-selected="false" aria-controls="panel-productivity" data-tab="productivity" onclick="switchWorkspaceTab('productivity')">📅 Productivity</button>
+        </div>
+
+        <div class="workspace-panels">
+            <div class="workspace-panel active" id="panel-voice" role="tabpanel" aria-labelledby="tab-voice">
+                <div class="panel-heading">
+                    <span class="small-label">VOICE ASSISTANT</span>
+                    <h3>Speak to Nexus</h3>
+                </div>
+                <button id="micButton" class="voice-orb" onclick="startVoiceOnPage()" title="Click and speak">🎤</button>
+                <div class="voice-activity" aria-live="polite">
+                    <div class="voice-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                    <span id="voiceStatus">Click the mic and speak</span>
+                </div>
+                <button type="button" class="secondary-button voice-stop-button" id="stopVoiceButton" onclick="stopVoiceAssistant()" disabled title="Stop listening or speech">■ Stop</button>
+                <div id="voiceResponse" class="voice-response"></div>
+            </div>
+
+            <div class="workspace-panel" id="panel-chat" role="tabpanel" aria-labelledby="tab-chat">
+                <div class="chat-layout">
+                    <aside class="chat-history" aria-label="Conversation history">
+                        <div class="history-heading">
+                            <div><span class="small-label">YOUR SPACE</span>
+                                <h3>Chats</h3>
+                            </div>
+                            <button class="icon-button" onclick="newChat()" title="Start a new chat" aria-label="Start a new chat">＋</button>
+                        </div>
+                        <div id="chatHistoryList" class="chat-history-list"></div>
+                    </aside>
+
+                    <div class="chat-main">
+                        <div class="chat-header panel-heading-row">
+                            <div>
+                                <span class="small-label">AI CHAT</span>
+                                <h3>Chat with Nexus</h3>
+                            </div>
+                            <div class="chat-header-actions">
+                                <button class="secondary-button speak-toggle" id="speakToggle" onclick="toggleReadAloud()" aria-pressed="false" title="Read replies aloud">◖)) Read replies</button>
+                                <button type="button" class="secondary-button voice-stop-button" onclick="stopVoiceAssistant()" disabled title="Stop listening or speech" aria-label="Stop voice chat">■ Stop</button>
+                                <button class="secondary-button" onclick="newChat()">New Chat</button>
+                            </div>
+                        </div>
+                        <div id="chatMessages" class="chat-messages">
+                            <div class="message nexus-message">
+                                <div class="message-avatar">N</div>
+                                <div class="message-content"><strong>Nexus</strong>
+                                    <p>Welcome back, {{ current_user.name }}. What would you like help with?</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="voice-activity" aria-live="polite">
+                            <div class="voice-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                            <span id="chatVoiceStatus">Ready to listen</span>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
+                            <button class="voice-button" onclick="startVoiceAssistant()" title="Voice input" aria-label="Voice input">🎤</button>
+                            <button class="send-button" onclick="sendMessage()">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workspace-panel" id="panel-automation" role="tabpanel" aria-labelledby="tab-automation">
+                <div class="panel-heading">
+                    <span class="small-label">TASK AUTOMATION</span>
+                    <h3>Run an automation command</h3>
+                </div>
+                <div class="automation-presets">
+                    <button class="secondary-button" onclick="runAutomationCommand('What is the current time')">🕐 Current Time</button>
+                    <button class="secondary-button" onclick="runAutomationCommand('What is today date')">📅 Today's Date</button>
+                    <button class="secondary-button" onclick="runAutomationCommand('Check system status')">🖥️ System Status</button>
+                    <button class="secondary-button" onclick="runAutomationCommand('Open my applications')">💻 Open Applications</button>
+                </div>
+                <div class="automation-input-area">
+                    <input type="text" id="automationInput" placeholder="Type an automation command..." autocomplete="off">
+                    <button class="primary-button" onclick="runCustomAutomation()">Run Command</button>
+                </div>
+                <div id="automationResult" class="automation-result"></div>
+            </div>
+
+            <div class="workspace-panel" id="panel-emotion" role="tabpanel" aria-labelledby="tab-emotion">
+                <div class="panel-heading">
+                    <span class="small-label">EMOTION DETECTION</span>
+                    <h3>How do you feel?</h3>
+                </div>
+                <textarea id="emotionText" rows="3" placeholder="Type how you feel..." aria-label="Describe how you feel"></textarea>
+                <button class="primary-button" onclick="analyzeEmotion()">Analyze Emotion</button>
+                <div id="emotionDisplay" class="emotion-display">
+                    <div id="emotionFace" class="emotion-face">😐</div>
+                    <div id="emotionLabel" class="emotion-label">Waiting for input...</div>
+                </div>
+            </div>
+
+            <div class="workspace-panel" id="panel-memory" role="tabpanel" aria-labelledby="tab-memory">
+                <div class="panel-heading">
+                    <span class="small-label">SMART MEMORY</span>
+                    <h3>What should Nexus remember?</h3>
+                </div>
+                <div class="memory-input-area">
+                    <input type="text" id="memoryInput" placeholder="Add something for Nexus to remember..." autocomplete="off">
+                    <button class="primary-button" onclick="saveMemory()">Remember</button>
+                </div>
+                <div class="memory-toolbar">
+                    <button class="secondary-button" onclick="loadMemories()">↻ Refresh</button>
+                </div>
+                <div id="memoryList" class="memory-list"></div>
+            </div>
+
+            <div class="workspace-panel" id="panel-productivity" role="tabpanel" aria-labelledby="tab-productivity">
+                <div class="panel-heading">
+                    <span class="small-label">PRODUCTIVITY</span>
+                    <h3>Schedule and reminders</h3>
+                </div>
+                <div id="productivityClock" class="productivity-clock">--</div>
+                <p id="productivityDate" class="productivity-date">--</p>
+                <a href="#today" class="secondary-button">Open reminders</a>
+            </div>
+        </div>
+    </div>
+</section>

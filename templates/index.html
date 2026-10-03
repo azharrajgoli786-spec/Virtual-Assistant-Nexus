@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Virtual Assistant Nexus</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body class="home-page" data-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}">
+
+    <!-- =====================================================
+         NAVIGATION BAR
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                N
+            </div>
+
+            <span>Nexus</span>
+
+        </div>
+
+
+        <div class="nav-links">
+
+            <a href="/" class="active">Home</a>
+
+            <a href="/login">Login</a>
+
+            <a href="/dashboard">Dashboard</a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-container">
+
+
+        <!-- HERO SECTION -->
+
+        <section class="hero-section">
+
+            <div class="hero-content fade-up">
+
+                <div class="status-badge">
+
+                    <span class="status-dot"></span> AI Powered
+
+                </div>
+
+
+                <h1>
+
+                    Meet
+
+                    <span class="gradient-text">
+                        Nexus AI
+                    </span>
+
+                </h1>
+
+
+                <p class="hero-subtitle">
+
+                    Your Intelligent AI Assistant
+
+                </p>
+
+
+                <p>
+
+                    Chat smarter. Work faster. Automate everything with our next-generation AI assistant built for everyone.
+
+                </p>
+
+
+                <div class="hero-buttons">
+
+                    <a href="/dashboard" class="primary-button">
+
+                        Get Started
+
+                    </a>
+
+
+                    <a href="/dashboard#workspace" class="secondary-button">Explore tools</a>
+
+                </div>
+
+
+                <div class="trust-badge">
+
+                    <span class="trust-star">⭐</span> Trusted by 10,000+ users
+
+                </div>
+
+            </div>
+
+
+            <!-- ANIMATED AI ORB + VOICE WAVE -->
+
+            <div class="ai-visual fade-up delay-1">
+
+                <div class="ai-orb">
+
+                    <div class="orb-ring"></div>
+
+                    <div class="orb-ring"></div>
+
+                    <div class="orb-ring"></div>
+
+                    <div class="orb-core">N</div>
+
+                </div>
+
+
+                <div class="voice-wave" aria-hidden="true">
+
+                    <span></span>
+
+                    <span></span>
+
+                    <span></span>
+
+                    <span></span>
+
+                    <span></span>
+
+                    <span></span>
+
+                    <span></span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FEATURE WORKSPACE (ALL FEATURES IN ONE FRAME)
+        ================================================== -->
+
+        <section class="features-section">
+
+            <div class="section-heading">
+
+                <span>FEATURES</span>
+
+                <h2>What Nexus Can Do</h2>
+
+            </div>
+
+
+            <div class="workspace-frame home-feature-frame fade-up">
+
+                <!-- TABS -->
+
+                <div class="home-feature-names" aria-label="Nexus features">
+                    <div class="home-feature-item">
+                        <a class="home-feature-name" href="{{ url_for('dashboard', tool='voice') }}#workspace" aria-describedby="feature-preview-voice">🎤 Voice</a>
+                        <span class="home-feature-preview" id="feature-preview-voice" role="tooltip">Speak a question and hear Nexus reply.</span>
+                    </div>
+                    <div class="home-feature-item">
+                        <a class="home-feature-name" href="{{ url_for('dashboard', tool='chat') }}#workspace" aria-describedby="feature-preview-chat">🤖 AI Chat</a>
+                        <span class="home-feature-preview" id="feature-preview-chat" role="tooltip">Ask questions and return to saved conversations.</span>
+                    </div>
+                    <div class="home-feature-item">
+                        <a class="home-feature-name" href="{{ url_for('dashboard', tool='automation') }}#workspace" aria-describedby="feature-preview-automation">⚙️ Automation</a>
+                        <span class="home-feature-preview" id="feature-preview-automation" role="tooltip">Run quick commands for time, date, and system status.</span>
+                    </div>
+                    <div class="home-feature-item">
+                        <a class="home-feature-name" href="{{ url_for('dashboard', tool='emotion') }}#workspace" aria-describedby="feature-preview-emotion">😊 Emotion</a>
+                        <span class="home-feature-preview" id="feature-preview-emotion" role="tooltip">Check the emotional tone of a message.</span>
+                    </div>
+                    <div class="home-feature-item">
+                        <a class="home-feature-name" href="{{ url_for('dashboard', tool='memory') }}#workspace" aria-describedby="feature-preview-memory">🧠 Memory</a>
+                        <span class="home-feature-preview" id="feature-preview-memory" role="tooltip">Save notes for Nexus to remember.</span>
+                    </div>
+                    <div class="home-feature-item">
+                        <a class="home-feature-name" href="{{ url_for('dashboard', tool='productivity') }}#workspace" aria-describedby="feature-preview-productivity">📅 Productivity</a>
+                        <span class="home-feature-preview" id="feature-preview-productivity" role="tooltip">See your day and manage reminders.</span>
+                    </div>
+                </div>
+
+
+                <!-- PANELS -->
+
+                <div class="workspace-panels" hidden inert>
+
+
+                    <!-- VOICE -->
+
+                    <div class="workspace-panel active" id="panel-voice">
+
+                        <div class="panel-heading">
+
+                            <span class="small-label">
+                                VOICE ASSISTANT
+                            </span>
+
+                            <h3>Speak to Nexus</h3>
+
+                        </div>
+
+
+                        <button id="micButton" class="voice-orb" onclick="startVoiceOnPage()" title="Click and speak">
+
+                            🎤
+
+                        </button>
+
+                        <p id="voiceStatus" class="voice-status">
+                            Click the mic and speak
+                        </p>
+
+                        <div id="voiceResponse" class="voice-response"></div>
+
+                    </div>
+
+
+                    <!-- AI CHAT -->
+
+                    <div class="workspace-panel" id="panel-chat">
+
+                        <div class="chat-layout">
+
+                            <aside class="chat-history" aria-label="Conversation history">
+                                <div class="history-heading">
+                                    <div><span class="small-label">YOUR SPACE</span>
+                                        <h3>Chats</h3>
+                                    </div>
+                                    <button class="icon-button" onclick="newChat()" title="Start a new chat" aria-label="Start a new chat">＋</button>
+                                </div>
+                                <div id="chatHistoryList" class="chat-history-list"></div>
+                            </aside>
+
+                            <div class="chat-main">
+                                <div class="chat-header panel-heading-row">
+
+                                    <div>
+
+                                        <span class="small-label">
+                                    AI CHAT
+                                </span>
+
+                                        <h3>Chat with Nexus</h3>
+
+                                    </div>
+
+
+                                    <div class="chat-header-actions">
+                                        <button class="secondary-button speak-toggle" id="speakToggle" onclick="toggleReadAloud()" aria-pressed="false" title="Read replies aloud">◖)) Read replies</button>
+                                        <button class="secondary-button voice-stop-button" id="stopVoiceButton" onclick="stopVoiceAssistant()" disabled title="Stop listening or speech" aria-label="Stop voice chat">■ Stop</button>
+                                        <button class="secondary-button" onclick="newChat()">New Chat</button>
+                                    </div>
+
+                                </div>
+
+
+                                <div id="chatMessages" class="chat-messages">
+
+                                    <div class="message nexus-message">
+
+                                        <div class="message-avatar">
+                                            N
+                                        </div>
+
+                                        <div class="message-content">
+
+                                            <strong>Nexus</strong>
+
+                                            <p>
+                                                Hello! I'm Nexus. What would you like me to do?
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="voice-activity" id="voiceActivity" aria-live="polite">
+                                    <div class="voice-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                                    <span id="chatVoiceStatus">Ready to listen</span>
+                                </div>
+
+
+                                <div class="chat-input-area">
+
+                                    <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
+
+
+                                    <button class="voice-button" onclick="startVoiceAssistant()" title="Voice input">
+
+                                🎤
+
+                            </button>
+
+
+                                    <button class="send-button" onclick="sendMessage()">
+
+                                Send
+
+                            </button>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <!-- AUTOMATION -->
+
+                    <div class="workspace-panel" id="panel-automation">
+
+                        <div class="panel-heading">
+
+                            <span class="small-label">
+                                TASK AUTOMATION
+                            </span>
+
+                            <h3>Run an automation command</h3>
+
+                        </div>
+
+
+                        <div class="automation-presets">
+
+                            <button class="secondary-button" onclick="runAutomationCommand('What is the current time')">
+                                🕐 Current Time
+                            </button>
+
+                            <button class="secondary-button" onclick="runAutomationCommand('What is today date')">
+                                📅 Today's Date
+                            </button>
+
+                            <button class="secondary-button" onclick="runAutomationCommand('Check system status')">
+                                🖥️ System Status
+                            </button>
+
+                            <button class="secondary-button" onclick="runAutomationCommand('Open my applications')">
+                                💻 Open Applications
+                            </button>
+
+                        </div>
+
+
+                        <div class="automation-input-area">
+
+                            <input type="text" id="automationInput" placeholder="Type an automation command..." autocomplete="off">
+
+
+                            <button class="primary-button" onclick="runCustomAutomation()">
+
+                                Run Command
+
+                            </button>
+
+                        </div>
+
+
+                        <div id="automationResult" class="automation-result"></div>
+
+                    </div>
+
+
+                    <!-- EMOTION -->
+
+                    <div class="workspace-panel" id="panel-emotion">
+
+                        <div class="panel-heading">
+
+                            <span class="small-label">
+                                EMOTION DETECTION
+                            </span>
+
+                            <h3>How do you feel?</h3>
+
+                        </div>
+
+
+                        <textarea id="emotionText" rows="3" placeholder="Type how you feel, e.g. 'I am so happy today' or 'I feel sad and tired'"></textarea>
+
+
+                        <button class="primary-button" onclick="analyzeEmotion()">
+
+                            Analyze Emotion
+
+                        </button>
+
+
+                        <div id="emotionDisplay" class="emotion-display">
+
+                            <div id="emotionFace" class="emotion-face">
+                                😐
+                            </div>
+
+                            <div id="emotionLabel" class="emotion-label">
+                                Waiting for input...
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MEMORY -->
+
+                    <div class="workspace-panel" id="panel-memory">
+
+                        <div class="panel-heading">
+
+                            <span class="small-label">
+                                SMART MEMORY
+                            </span>
+
+                            <h3>What should Nexus remember?</h3>
+
+                        </div>
+
+
+                        <div class="memory-input-area">
+
+                            <input type="text" id="memoryInput" placeholder="Add something for Nexus to remember..." autocomplete="off">
+
+
+                            <button class="primary-button" onclick="saveMemory()">
+
+                                Remember
+
+                            </button>
+
+                        </div>
+
+
+                        <div class="memory-toolbar">
+
+                            <button class="secondary-button" onclick="loadMemories()">
+
+                                ↻ Refresh
+
+                            </button>
+
+                        </div>
+
+
+                        <div id="memoryList" class="memory-list"></div>
+
+                    </div>
+
+
+                    <!-- PRODUCTIVITY -->
+
+                    <div class="workspace-panel" id="panel-productivity">
+
+                        <div class="panel-heading">
+
+                            <span class="small-label">
+                                PRODUCTIVITY
+                            </span>
+
+                            <h3>Schedule and reminders</h3>
+
+                        </div>
+
+
+                        <div id="productivityClock" class="productivity-clock">
+                            --
+                        </div>
+
+                        <p id="productivityDate" class="productivity-date">
+                            --
+                        </p>
+
+
+                        <div class="reminder-input-area">
+
+                            <input type="text" id="reminderInput" placeholder="Add a reminder..." autocomplete="off">
+
+                            <input type="datetime-local" id="reminderDueAt" aria-label="Reminder due date and time">
+
+
+                            <button class="primary-button" onclick="addReminder()">
+
+                                Add Reminder
+
+                            </button>
+
+                        </div>
+
+                        <button class="notification-button" id="notificationButton" onclick="enableReminderNotifications()" title="Enable browser notifications">Enable alerts</button>
+
+
+                        <div id="reminderList" class="reminder-list"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+        <p>
+            © 2026 Virtual Assistant Nexus | AI Powered Assistant
+        </p>
+
+    </footer>
+
+
+    <!-- FEATURE TOAST -->
+
+    <div id="featureToast" class="feature-toast" role="status"></div>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="{{ url_for('static', filename='js/script.js') }}">
+    </script>
+
+</body>
+
+</html>

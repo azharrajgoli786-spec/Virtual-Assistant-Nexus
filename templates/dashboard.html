@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body data-authenticated="true">
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">N</div>
+            <span>Nexus</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="">Home</a>
+            <a href="/dashboard" class="active">Dashboard</a>
+            <a href="/logout" class="logout-link">Logout</a>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert {% if category == 'success' %}alert-success{% else %}alert-error{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <main class="main-container control-room">
+        <section class="hero-section control-hero">
+            <div class="hero-content fade-up">
+                <div class="status-badge">
+                    <span class="status-dot"></span> Nexus is Online
+                </div>
+                <h1>Your day, in focus
+                    <span class="gradient-text">{{ current_user.name }}</span>
+                </h1>
+                <p>One place for your priorities, reminders, and conversations.</p>
+                <div class="hero-buttons">
+                    <a href="#today" class="primary-button">View today</a>
+                    <a href="#workspace" class="secondary-button" onclick="switchWorkspaceTab('chat')">Open chat</a>
+                </div>
+            </div>
+
+            <div class="assistant-card control-status-card fade-up delay-1">
+                <div class="assistant-header">
+                    <div>
+                        <span class="small-label">NEXUS SYSTEM</span>
+                        <h2>All systems ready</h2>
+                    </div>
+                    <div class="online-indicator">
+                        <span></span> Active
+                    </div>
+                </div>
+                <p class="assistant-message">Your assistant is ready when you are. Pick a prompt to get started.</p>
+                <div class="quick-actions">
+                    <button onclick="sendQuickMessage('Help me plan my day')">Plan my day</button>
+                    <button onclick="sendQuickMessage('Give me a quick focus exercise')">Focus reset</button>
+                    <button onclick="sendQuickMessage('Help me prioritize my tasks')">Prioritize</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="today-section" id="today" aria-labelledby="todayHeading">
+            <div class="today-overview">
+                <div class="today-heading">
+                    <div>
+                        <span class="small-label">DAILY BRIEFING</span>
+                        <h2 id="todayHeading">Today</h2>
+                    </div>
+                    <time id="todayDate"></time>
+                </div>
+                <p id="briefingSummary" class="briefing-summary">Loading your day...</p>
+                <div class="briefing-metrics">
+                    <div><strong id="pendingCount">0</strong><span>Open reminders</span></div>
+                    <div><strong id="overdueCount">0</strong><span>Past due</span></div>
+                </div>
+                <div id="briefingUpcoming" class="briefing-upcoming"></div>
+                <button class="quick-prompt" onclick="sendQuickMessage('Help me plan my day')">
+                    <span>↗</span> Ask Nexus to plan my day
+                </button>
+            </div>
+
+            <div class="today-reminders">
+                <div class="today-heading">
+                    <div>
+                        <span class="small-label">YOUR TASK LIST</span>
+                        <h2>Reminders</h2>
+                    </div>
+                    <button class="notification-button" id="notificationButton" onclick="enableReminderNotifications()" title="Enable browser notifications">Enable alerts</button>
+                </div>
+                <div class="reminder-input-area">
+                    <input type="text" id="reminderInput" maxlength="240" placeholder="What needs doing?" autocomplete="off">
+                    <input type="datetime-local" id="reminderDueAt" aria-label="Reminder due date and time">
+                    <button class="primary-button" onclick="addReminder()" title="Add reminder">Add</button>
+                </div>
+                <div id="reminderList" class="reminder-list"></div>
+            </div>
+        </section>
+
+        {% include "_feature_workspace.html" %}
+    </main>
+
+    <footer>
+        Nexus Dashboard · Built for intelligent assistant workflows.
+    </footer>
+
+    <div id="featureToast" class="feature-toast" role="status"></div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Nexus</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+    <!-- NAVIGATION -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                N
+            </div>
+
+            <span>Nexus</span>
+
+        </div>
+
+
+        <div class="nav-links">
+
+            <a href="/">Home</a>
+
+            <a href="/login" class="active">
+                Login
+            </a>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- LOGIN -->
+
+    <main class="auth-container">
+
+        <div class="auth-card">
+
+
+            <div class="auth-logo">
+                N
+            </div>
+
+
+            <h1 class="auth-title">
+                Welcome Back
+            </h1>
+
+
+            <p class="auth-subtitle">
+                Login to your Nexus account
+            </p>
+
+
+            <!-- FLASH MESSAGES -->
+
+            {% with messages = get_flashed_messages( with_categories=true ) %} {% if messages %} {% for category, message in messages %}
+
+            <div class="alert
+                            {% if category == 'success' %}
+                                alert-success
+                            {% else %}
+                                alert-error
+                            {% endif %}
+                        ">
+
+                {{ message }}
+
+            </div>
+
+            {% endfor %} {% endif %} {% endwith %}
+
+
+            <!-- LOGIN FORM -->
+
+            <form method="POST" action="{{ url_for('login') }}" autocomplete="off">
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <div class="input-wrap">
+                        <span class="field-icon">✉️</span>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="off" value="" required>
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="input-wrap">
+                        <span class="field-icon">🔒</span>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="off" value="" required>
+                        <button type="button" class="toggle-password" data-target="password" onclick="togglePassword(this)" aria-label="Show password" aria-pressed="false" title="Show password">👁️</button>
+                    </div>
+
+                </div>
+
+
+                <button type="submit" class="login-button">
+
+                    Login to Nexus
+
+                </button>
+
+            </form>
+
+
+            <div class="auth-footer">
+
+                Don't have an account?
+
+                <a href="/register">
+                    Create Account
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+    <script>
+        (function() {
+            function clearLoginFields() {
+                var email = document.getElementById("email");
+                var password = document.getElementById("password");
+                var toggle = document.querySelector(".toggle-password");
+
+                if (email) {
+                    email.value = "";
+                    email.defaultValue = "";
+                }
+                if (password) {
+                    password.value = "";
+                    password.defaultValue = "";
+                    password.type = "password";
+                }
+                if (toggle) {
+                    toggle.textContent = "👁️";
+                    toggle.title = "Show password";
+                    toggle.setAttribute("aria-label", "Show password");
+                    toggle.setAttribute("aria-pressed", "false");
+                }
+            }
+
+            clearLoginFields();
+            window.addEventListener("DOMContentLoaded", clearLoginFields);
+            window.addEventListener("pageshow", clearLoginFields);
+            window.addEventListener("pagehide", clearLoginFields);
+            window.addEventListener("load", function() {
+                window.setTimeout(clearLoginFields, 0);
+            });
+        })();
+    </script>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>
