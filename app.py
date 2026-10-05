@@ -33,6 +33,7 @@ from flask_login import (
 )
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect, CSRFError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from config import Config
 from extensions import db
@@ -99,11 +100,40 @@ login_manager.login_message = (
 
 
 # ============================================================
+# CSRF PROTECTION (form POSTs; JSON APIs exempt, see below)
+# ============================================================
+
+csrf = CSRFProtect()
+
+csrf.init_app(app)
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(error):
+
+    if request.path.startswith("/api/"):
+        return jsonify({
+
+            "success": False,
+
+            "message": "Session expired. Please refresh and try again."
+
+        }), 400
+
+    flash(
+        "Session expired. Please try again.",
+        "error"
+    )
+
+    return redirect(request.referrer or url_for("home")), 400
+
+
+# ============================================================
 # USER MODEL
 # ============================================================
 
 from model.user import User
-from model.workspace import ChatConversation, ChatMessage, Reminder
+from model.workspace import ChatConversation, ChatMessage, MemoryEntry, Reminder
 
 
 # ============================================================
@@ -113,7 +143,13 @@ from model.workspace import ChatConversation, ChatMessage, Reminder
 @login_manager.user_loader
 def load_user(user_id):
 
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+
+    db.session.remove()
 
 
 # ============================================================
@@ -355,6 +391,141 @@ def register():
 
     return render_template(
         "register.html"
+    )
+
+
+# ============================================================
+# FORGOT / RESET PASSWORD
+# ============================================================
+
+@app.route(
+    "/forgot-password",
+    methods=["GET", "POST"]
+)
+def forgot_password():
+
+    if current_user.is_authenticated:
+
+        return redirect(
+            url_for("dashboard")
+        )
+
+    if request.method == "POST":
+
+        email = request.form.get(
+            "email",
+            ""
+        ).strip().lower()
+
+        user = User.query.filter_by(
+            email=email
+        ).first() if email else None
+
+        if user:
+
+            token = user.get_reset_token()
+
+            logger.info(
+                "Password reset requested for %s",
+                email
+            )
+
+            flash(
+                "If that email is registered, a reset link is ready: "
+                + url_for("reset_password", token=token, _external=False)
+                + " (valid 1 hour). Email delivery can be wired up later.",
+                "success"
+            )
+
+        else:
+
+            # Same message either way so emails can't be enumerated.
+            flash(
+                "If that email is registered, a reset link will be sent.",
+                "success"
+            )
+
+        return redirect(
+            url_for("forgot_password")
+        )
+
+    return render_template(
+        "forgot_password.html"
+    )
+
+
+@app.route(
+    "/reset-password/<token>",
+    methods=["GET", "POST"]
+)
+def reset_password(token):
+
+    if current_user.is_authenticated:
+
+        return redirect(
+            url_for("dashboard")
+        )
+
+    user = User.verify_reset_token(token)
+
+    if not user:
+
+        flash(
+            "This reset link is invalid or expired. Please request a new one.",
+            "error"
+        )
+
+        return redirect(
+            url_for("forgot_password")
+        )
+
+    if request.method == "POST":
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+        if len(password) < 8:
+
+            flash(
+                "Password must be at least 8 characters.",
+                "error"
+            )
+
+            return render_template(
+                "reset_password.html",
+                token=token
+            )
+
+        user.set_password(password)
+
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            logger.exception("Password reset failed")
+            flash(
+                "Could not reset your password. Please try again.",
+                "error"
+            )
+            return render_template(
+                "reset_password.html",
+                token=token
+            )
+
+        flash(
+            "Password updated. Please login.",
+            "success"
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    return render_template(
+        "reset_password.html",
+        token=token
     )
 
 
@@ -1199,11 +1370,8 @@ def emotion():
 
 
 # ============================================================
-# MEMORY API
+# MEMORY API (per-user, database backed)
 # ============================================================
-
-MEMORY_STORE = []
-
 
 @app.route(
     "/api/memory",
@@ -1211,21 +1379,56 @@ MEMORY_STORE = []
 )
 def memory():
 
+    if not current_user.is_authenticated:
+
+        if request.method == "POST":
+
+            return jsonify({
+
+                "success": False,
+
+                "message": "Please log in to save memories."
+
+            }), 401
+
+        return jsonify({
+
+            "success": True,
+
+            "memory": []
+
+        })
+
     if request.method == "POST":
 
         data = request.get_json() or {}
 
         text = (data.get("text") or "").strip()
 
-        if text:
+        if not text or len(text) > 500:
 
-            MEMORY_STORE.append(text)
+            return jsonify({
+
+                "success": False,
+
+                "message": "Memory must be 1 to 500 characters."
+
+            }), 400
+
+        db.session.add(
+            MemoryEntry(user_id=current_user.id, text=text)
+        )
+        db.session.commit()
+
+    entries = MemoryEntry.query.filter_by(
+        user_id=current_user.id
+    ).order_by(MemoryEntry.created_at.desc()).all()
 
     return jsonify({
 
         "success": True,
 
-        "memory": MEMORY_STORE
+        "memory": [entry.text for entry in entries]
 
     })
 
@@ -1359,6 +1562,25 @@ def internal_server_error(error):
         "message": "Internal server error."
 
     }), 500
+
+
+# ============================================================
+# CSRF EXEMPTIONS FOR JSON APIS
+# Form POSTs (login/register/forgot/reset) stay CSRF-protected.
+# ============================================================
+
+for _api_view in (
+    chat,
+    chat_history,
+    chat_conversation,
+    voice,
+    memory,
+    automation,
+    reminders,
+    reminder_item,
+    emotion,
+):
+    csrf.exempt(_api_view)
 
 
 # ============================================================

@@ -44,6 +44,39 @@ class User(UserMixin, db.Model):
         )
 
 
+    def get_reset_token(self, expires_sec=3600):
+        from flask import current_app
+        from itsdangerous import URLSafeTimedSerializer
+
+        serializer = URLSafeTimedSerializer(
+            current_app.config["SECRET_KEY"],
+            salt="password-reset",
+        )
+
+        return serializer.dumps({"user_id": self.id})
+
+
+    @staticmethod
+    def verify_reset_token(token, expires_sec=3600):
+        from flask import current_app
+        from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+
+        serializer = URLSafeTimedSerializer(
+            current_app.config["SECRET_KEY"],
+            salt="password-reset",
+        )
+
+        try:
+            data = serializer.loads(
+                token,
+                max_age=expires_sec,
+            )
+        except (BadSignature, SignatureExpired):
+            return None
+
+        return db.session.get(User, data.get("user_id"))
+
+
     def __repr__(self):
 
         return f"<User {self.email}>"

@@ -1,3 +1,4 @@
+import re
 import unittest
 import uuid
 from datetime import datetime, timedelta
@@ -5,7 +6,7 @@ from unittest.mock import patch
 
 from app import app, db
 from model.user import User
-from model.workspace import ChatConversation, ChatMessage, Reminder
+from model.workspace import ChatConversation, ChatMessage, MemoryEntry, Reminder
 
 
 class WorkspaceApiTests(unittest.TestCase):
@@ -29,6 +30,7 @@ class WorkspaceApiTests(unittest.TestCase):
                         ChatConversation.id.in_(conversation_ids)
                     ).delete(synchronize_session=False)
                 Reminder.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+                MemoryEntry.query.filter_by(user_id=user_id).delete(synchronize_session=False)
                 User.query.filter_by(id=user_id).delete(synchronize_session=False)
             db.session.commit()
             db.session.remove()
@@ -46,9 +48,15 @@ class WorkspaceApiTests(unittest.TestCase):
         return {"id": user.id, "email": user.email}
 
     def login(self, user):
+        page = self.client.get("/login").data.decode("utf-8")
+        token = re.search(r'name="csrf_token" value="([^"]+)"', page).group(1)
         response = self.client.post(
             "/login",
-            data={"email": user["email"], "password": "test-password"},
+            data={
+                "email": user["email"],
+                "password": "test-password",
+                "csrf_token": token,
+            },
         )
         self.assertEqual(response.status_code, 302)
 

@@ -9,6 +9,8 @@
 
     <title>Login | Nexus</title>
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -96,6 +98,7 @@
             <!-- LOGIN FORM -->
 
             <form method="POST" action="{{ url_for('login') }}" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="form-group">
 
@@ -137,6 +140,15 @@
 
             <div class="auth-footer">
 
+                <a href="{{ url_for('forgot_password') }}">
+                    Forgot password?
+                </a>
+
+            </div>
+
+
+            <div class="auth-footer">
+
                 Don't have an account?
 
                 <a href="/register">
@@ -149,6 +161,11 @@
         </div>
 
     </main>
+
+    <footer class="site-footer">
+        <p class="footer-project">Virtual Assistant Nexus</p>
+        <p>© 2026 Virtual Assistant Nexus | AI Powered Assistant</p>
+    </footer>
 
     <script>
         (function() {

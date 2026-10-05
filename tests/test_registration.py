@@ -1,3 +1,4 @@
+import re
 import unittest
 import uuid
 from unittest.mock import patch
@@ -6,6 +7,13 @@ from sqlalchemy.exc import IntegrityError
 
 from app import app, db
 from model.user import User
+
+
+def get_csrf_token(client, path):
+    page = client.get(path).data.decode("utf-8")
+    match = re.search(r'name="csrf_token" value="([^"]+)"', page)
+    assert match, f"CSRF token not found on {path}"
+    return match.group(1)
 
 
 class RegistrationTests(unittest.TestCase):
@@ -27,6 +35,7 @@ class RegistrationTests(unittest.TestCase):
                 "name": "Registration Test",
                 "email": self.email,
                 "password": "test-password",
+                "csrf_token": get_csrf_token(self.client, "/register"),
             },
             follow_redirects=True,
         )
@@ -54,7 +63,11 @@ class RegistrationTests(unittest.TestCase):
 
         invalid = self.client.post(
             "/login",
-            data={"email": self.email, "password": "wrong-password"},
+            data={
+                "email": self.email,
+                "password": "wrong-password",
+                "csrf_token": get_csrf_token(self.client, "/login"),
+            },
             follow_redirects=True,
         )
         self.assertIn(b'value=""', invalid.data)
@@ -62,7 +75,11 @@ class RegistrationTests(unittest.TestCase):
 
         valid = self.client.post(
             "/login",
-            data={"email": self.email.upper(), "password": "test-password"},
+            data={
+                "email": self.email.upper(),
+                "password": "test-password",
+                "csrf_token": get_csrf_token(self.client, "/login"),
+            },
             follow_redirects=True,
         )
         self.assertEqual(valid.status_code, 200)

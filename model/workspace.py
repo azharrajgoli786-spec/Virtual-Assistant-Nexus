@@ -43,3 +43,12 @@ class Reminder(db.Model):
     due_at = db.Column(db.DateTime, nullable=True, index=True)
     completed = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
+
+class MemoryEntry(db.Model):
+    __tablename__ = "memory_entries"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    text = db.Column(db.String(500), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)

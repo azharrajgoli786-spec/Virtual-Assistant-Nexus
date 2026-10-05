@@ -5,6 +5,25 @@
 
 
 // ============================================================
+// CSRF TOKEN (forms protected; JSON APIs read it if required)
+// ============================================================
+
+function csrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.content : "";
+}
+
+function jsonHeaders(extra = {}) {
+    const headers = { "Content-Type": "application/json", ...extra };
+    const token = csrfToken();
+    if (token) {
+        headers["X-CSRFToken"] = token;
+    }
+    return headers;
+}
+
+
+// ============================================================
 // CHAT INPUT
 // ============================================================
 
@@ -1531,19 +1550,29 @@ async function saveMemory() {
 
     try {
 
-        await fetch("/api/memory", {
+        const response = await fetch("/api/memory", {
 
             method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: jsonHeaders(),
 
             body: JSON.stringify({
                 text: text
             })
 
         });
+
+        const data = await response.json().catch(function() {
+            return {};
+        });
+
+        if (!response.ok || data.success === false) {
+            showFeatureToast(
+                (data && data.message) || "Please log in to save memories."
+            );
+
+            return;
+        }
 
 
         showFeatureToast(

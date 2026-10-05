@@ -1308,6 +1308,17 @@ footer {
     font-size: 13px;
 }
 
+.site-footer p {
+    margin: 4px 0;
+}
+
+.footer-project {
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.4px;
+    color: var(--text, #1a2340);
+}
+
 
 /* ==========================================================
    RESPONSIVE
