@@ -1611,7 +1611,7 @@ if __name__ == "__main__":
     )
 
     print(
-        "Open: http://127.0.0.1:5000"
+        "Open: http://127.0.0.1:5001"
     )
 
     print("=" * 60)
@@ -1621,7 +1621,7 @@ if __name__ == "__main__":
 
         host="127.0.0.1",
 
-        port=5000,
+        port=5001,
 
         debug=True
 
