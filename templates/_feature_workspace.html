@@ -93,15 +93,32 @@
             </div>
 
             <div class="workspace-panel" id="panel-emotion" role="tabpanel" aria-labelledby="tab-emotion">
-                <div class="panel-heading">
-                    <span class="small-label">EMOTION DETECTION</span>
-                    <h3>How do you feel?</h3>
-                </div>
-                <textarea id="emotionText" rows="3" placeholder="Type how you feel..." aria-label="Describe how you feel"></textarea>
-                <button class="primary-button" onclick="analyzeEmotion()">Analyze Emotion</button>
-                <div id="emotionDisplay" class="emotion-display">
-                    <div id="emotionFace" class="emotion-face">😐</div>
-                    <div id="emotionLabel" class="emotion-label">Waiting for input...</div>
+                <div class="emotion-glass">
+                    <div class="panel-heading">
+                        <span class="small-label">EMOTION DETECTION</span>
+                        <h3>😊 Emotion Detection – Understand How You’re Feeling</h3>
+                        <p class="emotion-sub">Type how you feel below. Nexus reads the emotional tone and responds with support.</p>
+                    </div>
+                    <div class="emotion-quick" aria-label="Quick emotion options">
+                        <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I am feeling happy today')">😊 Happy</button>
+                        <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I feel neutral and okay')">😐 Neutral</button>
+                        <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I feel sad and down today')">😢 Sad</button>
+                        <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I am angry and frustrated')">😠 Angry</button>
+                        <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I feel anxious and stressed')">😰 Anxious</button>
+                    </div>
+                    <textarea id="emotionText" class="emotion-input" rows="4" placeholder="Type how you feel, e.g. 'I am so happy today' or 'I feel sad and tired'" aria-label="Describe how you feel"></textarea>
+                    <button class="primary-button emotion-analyze" onclick="analyzeEmotion()">✨ Analyze Emotion</button>
+                    <div id="emotionDisplay" class="emotion-display emotion-result-card" aria-live="polite">
+                        <div id="emotionFace" class="emotion-face emotion-result-face">😐</div>
+                        <div id="emotionLabel" class="emotion-label emotion-result-name">Waiting for input...</div>
+                        <div id="emotionStrength" class="emotion-strength">Keyword method · no input yet</div>
+                        <p id="emotionNexusReply" class="emotion-nexus-reply">I’m Nexus — share how you feel and I’ll respond here.</p>
+                    </div>
+                    <div class="emotion-recent">
+                        <h4>Recent Emotions</h4>
+                        <div id="recentEmotionsList" class="emotion-recent-list"></div>
+                        <button type="button" class="emotion-clear-btn" onclick="clearRecentEmotions()">Clear history</button>
+                    </div>
                 </div>
             </div>
 

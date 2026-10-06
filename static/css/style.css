@@ -1663,6 +1663,202 @@ footer {
 
 
 /* ==========================================================
+   EMOTION GLASS CARD (professional redesign)
+========================================================== */
+
+.emotion-glass {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 32px 30px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(160deg, rgba(108, 99, 255, 0.12), rgba(0, 198, 255, 0.07) 55%, rgba(0, 0, 0, 0.28));
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    animation: emotionFadeUp 0.45s ease both;
+}
+
+.emotion-sub {
+    color: var(--muted);
+    font-size: 14.5px;
+    margin-top: 8px;
+}
+
+.emotion-quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.emotion-quick-btn {
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform var(--transition), background var(--transition), border-color var(--transition);
+}
+
+.emotion-quick-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(108, 99, 255, 0.18);
+    border-color: rgba(108, 99, 255, 0.55);
+}
+
+.emotion-input {
+    width: 100%;
+    min-height: 110px;
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-strong);
+    background: rgba(0, 0, 0, 0.32);
+    color: #fff;
+    font-family: inherit;
+    font-size: 15.5px;
+    line-height: 1.6;
+    outline: none;
+    resize: vertical;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.emotion-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.18);
+}
+
+.emotion-analyze {
+    align-self: flex-start;
+    font-size: 15.5px;
+    padding: 13px 26px;
+    border-radius: 12px;
+    background: var(--grad);
+    box-shadow: 0 12px 30px rgba(108, 99, 255, 0.35);
+}
+
+.emotion-result-card {
+    min-width: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.26);
+    animation: emotionPop 0.35s ease both;
+}
+
+.emotion-result-face {
+    font-size: 72px;
+}
+
+.emotion-result-name {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.emotion-strength {
+    font-size: 13px;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 999px;
+}
+
+.emotion-nexus-reply {
+    font-size: 14.5px;
+    color: var(--text);
+    background: rgba(108, 99, 255, 0.12);
+    border: 1px solid rgba(108, 99, 255, 0.3);
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    max-width: 480px;
+    text-align: center;
+}
+
+.emotion-recent {
+    width: 100%;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+}
+
+.emotion-recent h4 {
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 10px 0;
+}
+
+.emotion-recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.emotion-recent-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+}
+
+.emotion-recent-item time {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.emotion-recent-empty {
+    color: var(--muted);
+    font-size: 13.5px;
+}
+
+.emotion-clear-btn {
+    margin-top: 10px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 12.5px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+@keyframes emotionFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes emotionPop {
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* ==========================================================
    MEMORY PAGE
 ========================================================== */
 

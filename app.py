@@ -1317,20 +1317,127 @@ def daily_briefing():
 # EMOTION DETECTION API
 # ============================================================
 
-HAPPY_WORDS = [
-    "happy", "great", "awesome", "excellent", "wonderful",
-    "amazing", "love", "glad", "joy", "excited", "good", "nice"
-]
+EMOTION_KEYWORDS = {
+    "happy": [
+        "happy", "happier", "happiest", "glad", "delighted",
+        "cheerful", "joyful", "joy", "great", "awesome",
+        "excellent", "wonderful", "amazing", "fantastic",
+        "good", "nice", "positive", "pleased", "content",
+        "fine", "okay", "well",
+    ],
+    "excited": [
+        "excited", "thrilled", "ecstatic", "pumped",
+        "eager", "enthusiastic", "enthusiasm", "stoked",
+    ],
+    "love": [
+        "love", "loved", "loving", "adore", "adored",
+        "affection", "grateful", "thankful", "blessed",
+        "caring",
+    ],
+    "sad": [
+        "sad", "sadder", "saddest", "upset", "down",
+        "lonely", "depressed", "depression", "cry",
+        "crying", "tears", "tearful", "heartbroken",
+        "unhappy", "disappointed", "disappointment",
+        "gloomy", "miserable", "hopeless", "blue",
+        "low", "dejected",
+    ],
+    "angry": [
+        "angry", "mad", "furious", "annoyed", "annoy",
+        "frustrated", "frustration", "irritated",
+        "hate", "hated", "rage", "enraged", "anger",
+        "outrage", "outraged", "grumpy",
+    ],
+    "anxious": [
+        "anxious", "anxiety", "worried", "worry",
+        "nervous", "stressed", "stress", "overwhelmed",
+        "panic", "panicked", "uneasy", "tense",
+        "restless", "pressure", "anxiety",
+    ],
+    "fear": [
+        "fear", "fearful", "scared", "afraid",
+        "frightened", "terrified", "horror", "dread",
+        "insecure", "scary",
+    ],
+    "surprise": [
+        "surprised", "surprise", "shocked", "shock",
+        "stunned", "astonished", "amazed", "amazement",
+        "unexpected", "wow",
+    ],
+    "disgust": [
+        "disgusted", "disgust", "gross", "sickening",
+        "nauseous", "revolting",
+    ],
+    "tired": [
+        "tired", "exhausted", "exhausting", "sleepy",
+        "drained", "fatigue", "lethargic", "bored",
+        "boredom", "burnout", "burnt out", "burned out",
+        "drowsy", "weary",
+    ],
+    "confused": [
+        "confused", "confusion", "unsure", "uncertain",
+        "lost", "puzzled", "puzzling", "doubtful",
+    ],
+}
 
-SAD_WORDS = [
-    "sad", "upset", "down", "lonely", "depressed", "cry",
-    "heartbroken", "tired", "unhappy", "disappointed"
-]
+NEGATION_WORDS = {
+    "not", "no", "never", "hardly", "barely",
+    "rarely", "seldom", "dont", "don't", "doesnt",
+    "doesn't", "didnt", "didn't", "wont", "won't",
+    "cant", "can't", "cannot", "couldnt", "couldn't",
+    "isnt", "isn't", "arent", "aren't", "wasnt",
+    "wasn't", "werent", "weren't", "aint", "ain't",
+}
 
-ANGRY_WORDS = [
-    "angry", "mad", "furious", "annoyed", "frustrated",
-    "irritated", "hate", "angry", "rage"
-]
+
+def detect_emotion_scores(message):
+    text = (message or "").lower().replace("\u2019", "'").replace("\u2018", "'")
+    tokens = re.findall(r"[a-z']+", text)
+    scores = {emotion: 0 for emotion in EMOTION_KEYWORDS}
+    negated_positive = False
+    negated_count = 0
+
+    for emotion, words in EMOTION_KEYWORDS.items():
+        for phrase in words:
+            phrase_tokens = phrase.split()
+            if len(phrase_tokens) == 1:
+                for index, token in enumerate(tokens):
+                    if token != phrase_tokens[0]:
+                        continue
+                    window = tokens[max(0, index - 3):index]
+                    if any(w in NEGATION_WORDS for w in window):
+                        negated_count += 1
+                        if emotion in ("happy", "excited", "love", "surprise"):
+                            negated_positive = True
+                        continue
+                    scores[emotion] += 1
+            else:
+                for index in range(len(tokens) - len(phrase_tokens) + 1):
+                    if tokens[index:index + len(phrase_tokens)] != phrase_tokens:
+                        continue
+                    window = tokens[max(0, index - 3):index]
+                    if any(w in NEGATION_WORDS for w in window):
+                        negated_count += 1
+                        if emotion in ("happy", "excited", "love", "surprise"):
+                            negated_positive = True
+                        continue
+                    scores[emotion] += 1
+
+    return scores, negated_positive, negated_count
+
+
+def detect_emotion(message):
+    if not (message or "").strip():
+        return "neutral"
+    scores, negated_positive, negated_count = detect_emotion_scores(message)
+    best = max(scores, key=lambda key: scores[key])
+    if scores[best] > 0:
+        return best
+    if negated_positive:
+        return "sad"
+    if negated_count > 0:
+        return "neutral"
+    return "neutral"
 
 
 @app.route(
@@ -1343,25 +1450,21 @@ def emotion():
 
     message = (data.get("message") or "").lower()
 
-    detected = "neutral"
-
-    if not message:
-        detected = "neutral"
-
-    elif any(word in message for word in HAPPY_WORDS):
-        detected = "happy"
-
-    elif any(word in message for word in SAD_WORDS):
-        detected = "sad"
-
-    elif any(word in message for word in ANGRY_WORDS):
-        detected = "angry"
+    scores, negated_positive, negated_count = detect_emotion_scores(message)
+    detected = detect_emotion(message)
+    matches = int(scores.get(detected, 0)) if detected in scores else 0
 
     return jsonify({
 
         "success": True,
 
         "emotion": detected,
+
+        "matches": matches,
+
+        "scores": scores,
+
+        "method": "keyword",
 
         "message":
         f"Detected emotion: {detected}"
@@ -1478,6 +1581,95 @@ def automation():
     lower = command.lower()
 
     now = datetime.now()
+
+    if any(word in lower for word in ("open", "launch", "start", "run")):
+
+        import os
+        import shutil
+        import subprocess
+        import webbrowser
+
+        def launch_program(exe_names, fallback_url=None, label="application"):
+            for exe in exe_names:
+                path = shutil.which(exe)
+                if path:
+                    try:
+                        subprocess.Popen(
+                            [path],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                            close_fds=True,
+                        )
+                        return True, f"Opened {label}."
+                    except Exception as exc:
+                        logger.warning("Automation launch failed (%s): %s", exe, exc)
+            if fallback_url:
+                try:
+                    webbrowser.open(fallback_url)
+                    return True, f"Opened {label} in browser."
+                except Exception as exc:
+                    logger.warning("Automation browser open failed: %s", exc)
+            return False, ""
+
+        targets = (
+            ("chrome", (["chrome", "chrome.exe"], "https://www.google.com", "Chrome")),
+            ("edge", (["msedge", "msedge.exe"], "https://www.microsoft.com/edge", "Edge")),
+            ("firefox", (["firefox", "firefox.exe"], "https://www.mozilla.org", "Firefox")),
+            ("youtube", (([], "https://www.youtube.com", "YouTube"))),
+            ("whatsapp", ((["WhatsApp", "WhatsApp.exe"], "https://web.whatsapp.com", "WhatsApp"))),
+            ("gmail", (([], "https://mail.google.com", "Gmail"))),
+            ("google", (([], "https://www.google.com", "Google"))),
+            ("github", (([], "https://github.com", "GitHub"))),
+            ("notepad", (["notepad", "notepad.exe"], None, "Notepad")),
+            ("calculator", (["calc", "calc.exe"], None, "Calculator")),
+            ("calc", (["calc", "calc.exe"], None, "Calculator")),
+            ("paint", (["mspaint", "mspaint.exe"], None, "Paint")),
+            ("wordpad", (["wordpad", "write"], None, "WordPad")),
+            ("explorer", (["explorer"], None, "File Explorer")),
+            ("files", (["explorer"], None, "File Explorer")),
+            ("vs code", (["code", "code.exe"], None, "VS Code")),
+            ("vscode", (["code", "code.exe"], None, "VS Code")),
+            ("terminal", (["cmd", "wt"], None, "Terminal")),
+            ("command prompt", (["cmd"], None, "Command Prompt")),
+            ("task manager", (["taskmgr"], None, "Task Manager")),
+            ("settings", (["ms-settings:"], None, "Settings")),
+        )
+
+        for key, (exes, url, label) in targets:
+            if key in lower:
+                if key == "settings":
+                    try:
+                        os.startfile("ms-settings:")  # noqa: S606 - fixed allowlisted target
+                        return jsonify({"success": True, "message": "Opened Settings."})
+                    except Exception as exc:
+                        logger.warning("Automation launch failed (settings): %s", exc)
+                        return jsonify({"success": False, "message": "Could not open Settings."}), 500
+                ok, message = launch_program(exes, url, label)
+                if ok:
+                    return jsonify({"success": True, "message": message})
+                return jsonify({
+                    "success": False,
+                    "message": f"Could not open {label}. It may not be installed.",
+                }), 500
+
+        if "application" in lower or "applications" in lower or "apps" in lower:
+            return jsonify({
+                "success": True,
+                "message": (
+                    "I can open: Chrome, Edge, Notepad, Calculator, Paint, "
+                    "File Explorer, VS Code, Terminal, Task Manager, Settings, "
+                    "or websites like YouTube, WhatsApp, Gmail, Google, GitHub. "
+                    "Try: open whatsapp."
+                ),
+            })
+
+        return jsonify({
+            "success": False,
+            "message": (
+                f"I don't know how to open that yet: {command}. "
+                "Try: open whatsapp, open calculator, open notepad, or open youtube."
+            ),
+        }), 400
 
     if "time" in lower:
 

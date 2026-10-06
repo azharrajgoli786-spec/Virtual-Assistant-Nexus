@@ -160,6 +160,66 @@
 
 
         <!-- =================================================
+             WHAT IS NEXUS / WHY LOGIN
+        ================================================== -->
+
+        <section class="features-section">
+
+            <div class="section-heading">
+
+                <span>WHY NEXUS</span>
+
+                <h2>What is this app?</h2>
+
+                <p>
+                    Nexus is your personal AI assistant for chatting, voice input,
+                    reminders, notes memory, and quick automation — all in one private dashboard.
+                    Create an account and log in to save your chats, memories, and reminders securely.
+                </p>
+
+            </div>
+
+
+            <div class="features-grid">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">🔒</div>
+
+                    <h3>Why log in?</h3>
+
+                    <p>Login gives you your own private workspace. Your conversations, memories, and reminders are saved per account and shown only to you.</p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">🚀</div>
+
+                    <h3>What you get</h3>
+
+                    <p>AI chat with history, voice assistant, emotion check, smart memory, reminders with daily briefing, and time/date/status automation.</p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">👉</div>
+
+                    <h3>How to start</h3>
+
+                    <p>Create a free account, log in, then open the dashboard and click Get Started. No setup needed — just type or speak.</p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
              FEATURE WORKSPACE (ALL FEATURES IN ONE FRAME)
         ================================================== -->
 
@@ -394,35 +454,71 @@
 
                     <div class="workspace-panel" id="panel-emotion">
 
-                        <div class="panel-heading">
+                        <div class="emotion-glass">
 
-                            <span class="small-label">
-                                EMOTION DETECTION
-                            </span>
+                            <div class="panel-heading">
 
-                            <h3>How do you feel?</h3>
+                                <span class="small-label">
+                                    EMOTION DETECTION
+                                </span>
 
-                        </div>
+                                <h3>😊 Emotion Detection – Understand How You’re Feeling</h3>
 
+                                <p class="emotion-sub">Type how you feel below. Nexus reads the emotional tone and responds with support.</p>
 
-                        <textarea id="emotionText" rows="3" placeholder="Type how you feel, e.g. 'I am so happy today' or 'I feel sad and tired'"></textarea>
-
-
-                        <button class="primary-button" onclick="analyzeEmotion()">
-
-                            Analyze Emotion
-
-                        </button>
-
-
-                        <div id="emotionDisplay" class="emotion-display">
-
-                            <div id="emotionFace" class="emotion-face">
-                                😐
                             </div>
 
-                            <div id="emotionLabel" class="emotion-label">
-                                Waiting for input...
+
+                            <div class="emotion-quick" aria-label="Quick emotion options">
+
+                                <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I am feeling happy today')">😊 Happy</button>
+
+                                <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I feel neutral and okay')">😐 Neutral</button>
+
+                                <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I feel sad and down today')">😢 Sad</button>
+
+                                <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I am angry and frustrated')">😠 Angry</button>
+
+                                <button type="button" class="emotion-quick-btn" onclick="selectEmotionOption('I feel anxious and stressed')">😰 Anxious</button>
+
+                            </div>
+
+
+                            <textarea id="emotionText" class="emotion-input" rows="4" placeholder="Type how you feel, e.g. 'I am so happy today' or 'I feel sad and tired'"></textarea>
+
+
+                            <button class="primary-button emotion-analyze" onclick="analyzeEmotion()">
+
+                                ✨ Analyze Emotion
+
+                            </button>
+
+
+                            <div id="emotionDisplay" class="emotion-display emotion-result-card">
+
+                                <div id="emotionFace" class="emotion-face emotion-result-face">
+                                    😐
+                                </div>
+
+                                <div id="emotionLabel" class="emotion-label emotion-result-name">
+                                    Waiting for input...
+                                </div>
+
+                                <div id="emotionStrength" class="emotion-strength">Keyword method · no input yet</div>
+
+                                <p id="emotionNexusReply" class="emotion-nexus-reply">I’m Nexus — share how you feel and I’ll respond here.</p>
+
+                            </div>
+
+
+                            <div class="emotion-recent">
+
+                                <h4>Recent Emotions</h4>
+
+                                <div id="recentEmotionsList" class="emotion-recent-list"></div>
+
+                                <button type="button" class="emotion-clear-btn" onclick="clearRecentEmotions()">Clear history</button>
+
                             </div>
 
                         </div>

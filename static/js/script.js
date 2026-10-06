@@ -1326,6 +1326,109 @@ function runCustomAutomation() {
 // EMOTION PAGE
 // ============================================================
 
+const EMOTION_FACES = {
+    happy: "😊",
+    excited: "🤩",
+    love: "❤️",
+    sad: "😔",
+    angry: "😠",
+    anxious: "😟",
+    fear: "😨",
+    surprise: "😲",
+    disgust: "🤢",
+    tired: "😴",
+    confused: "😕",
+    neutral: "😐"
+};
+
+const EMOTION_LABELS = {
+    happy: "Happy",
+    excited: "Excited",
+    love: "Love",
+    sad: "Sad",
+    angry: "Angry",
+    anxious: "Anxious",
+    fear: "Fear",
+    surprise: "Surprised",
+    disgust: "Disgusted",
+    tired: "Tired",
+    confused: "Confused",
+    neutral: "Neutral"
+};
+
+const EMOTION_REPLIES = {
+    happy: "Wonderful to hear that! Keep that positive energy going.",
+    excited: "Love that excitement! Channel it into something great today.",
+    love: "That warmth matters. Take a moment to appreciate it.",
+    sad: "Take a moment to relax, I’m here if you want to talk.",
+    angry: "Take a slow breath. Want to talk through what frustrated you?",
+    anxious: "Take a moment to relax. One small step at a time — I’m here.",
+    fear: "You’re safe here. Tell me what’s worrying you.",
+    surprise: "Unexpected moments can be a lot. Want to share more?",
+    disgust: "That sounds unpleasant. Want to clear your mind with something else?",
+    tired: "Rest matters. Consider a short break — I can wait.",
+    confused: "That’s okay to feel. Tell me more and we’ll sort it together.",
+    neutral: "Thanks for sharing. I’m here whenever you want to talk."
+};
+
+function selectEmotionOption(text) {
+    const textarea = document.getElementById("emotionText");
+    if (textarea) {
+        textarea.value = text;
+    }
+    analyzeEmotion();
+}
+
+function getRecentEmotions() {
+    try {
+        return JSON.parse(localStorage.getItem("nexus_recent_emotions") || "[]");
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveRecentEmotion(emotion, text) {
+    const entry = {
+        emotion: emotion,
+        text: (text || "").slice(0, 80),
+        time: new Date().toLocaleString(),
+    };
+    const history = getRecentEmotions();
+    history.unshift(entry);
+    try {
+        localStorage.setItem("nexus_recent_emotions", JSON.stringify(history.slice(0, 8)));
+    } catch (error) {
+        console.error(error);
+    }
+    renderRecentEmotions();
+}
+
+function renderRecentEmotions() {
+    const listEl = document.getElementById("recentEmotionsList");
+    if (!listEl) {
+        return;
+    }
+    const history = getRecentEmotions();
+    if (!history.length) {
+        listEl.innerHTML = '<div class="emotion-recent-empty">No emotions analyzed yet.</div>';
+        return;
+    }
+    listEl.innerHTML = history.map(function (item) {
+        const face = EMOTION_FACES[item.emotion] || "😐";
+        const label = EMOTION_LABELS[item.emotion] || item.emotion;
+        return '<div class="emotion-recent-item"><span>' + face + '</span><span>' + label + '</span><time>' + item.time + '</time></div>';
+    }).join("");
+}
+
+function clearRecentEmotions() {
+    try {
+        localStorage.removeItem("nexus_recent_emotions");
+    } catch (error) {
+        console.error(error);
+    }
+    renderRecentEmotions();
+}
+
 async function analyzeEmotion() {
 
     const textarea =
@@ -1374,29 +1477,6 @@ async function analyzeEmotion() {
             await response.json();
 
 
-        const faces = {
-
-            happy: "😊",
-
-            sad: "😔",
-
-            angry: "😠",
-
-            neutral: "😐"
-
-        };
-
-
-        const labels = {
-
-            happy: "Happy",
-            sad: "Sad",
-            angry: "Angry",
-            neutral: "Neutral"
-
-        };
-
-
         const emotion =
             data.emotion || "neutral";
 
@@ -1413,10 +1493,22 @@ async function analyzeEmotion() {
             );
 
 
+        const strengthEl =
+            document.getElementById(
+                "emotionStrength"
+            );
+
+
+        const replyEl =
+            document.getElementById(
+                "emotionNexusReply"
+            );
+
+
         if (faceEl) {
 
             faceEl.textContent =
-                faces[emotion] || "😐";
+                EMOTION_FACES[emotion] || "😐";
 
         }
 
@@ -1424,10 +1516,29 @@ async function analyzeEmotion() {
         if (labelEl) {
 
             labelEl.textContent =
-                "Detected emotion: " +
-                (labels[emotion] || emotion);
+                EMOTION_LABELS[emotion] || emotion;
 
         }
+
+
+        if (strengthEl) {
+
+            const matches = (data.matches !== undefined && data.matches !== null) ? data.matches : 0;
+            const method = data.method || "keyword";
+            strengthEl.textContent =
+                method + " method · " + matches + " match" + (matches === 1 ? "" : "es");
+
+        }
+
+
+        if (replyEl) {
+
+            replyEl.textContent =
+                EMOTION_REPLIES[emotion] || EMOTION_REPLIES.neutral;
+
+        }
+
+        saveRecentEmotion(emotion, message);
 
     } catch (error) {
 
@@ -2033,6 +2144,8 @@ document.addEventListener(
         loadChatHistory();
 
         loadMemories();
+
+        renderRecentEmotions();
 
         updateProductivityClock();
 
